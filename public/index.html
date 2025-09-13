@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lampadina MCP</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-color: #1a1a1a;
+            color: white;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .lampadina {
+            width: 200px;
+            height: 300px;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            margin: 20px auto;
+            border: 4px solid #333;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+        }
+
+        .lampadina.spenta {
+            background-color: #333;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .lampadina.accesa {
+            box-shadow: 0 0 50px currentColor;
+        }
+
+        .base {
+            width: 80px;
+            height: 40px;
+            background-color: #666;
+            margin: 0 auto;
+            border-radius: 5px;
+        }
+
+        .controls {
+            margin: 30px 0;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .toggle-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .toggle-btn:hover {
+            background-color: #45a049;
+        }
+
+        .color-picker {
+            margin: 20px 0;
+        }
+
+        .color-picker input[type="color"] {
+            width: 60px;
+            height: 60px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .brightness-control {
+            margin: 20px 0;
+        }
+
+        .brightness-control input[type="range"] {
+            width: 300px;
+            height: 10px;
+        }
+
+        .status {
+            background-color: #333;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .preset-colors {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .preset-color {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #333;
+            transition: transform 0.2s;
+        }
+
+        .preset-color:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔌 Lampadina MCP</h1>
+
+        <div class="lampadina spenta" id="lampadina">
+            <div class="filament"></div>
+        </div>
+        <div class="base"></div>
+
+        <div class="controls">
+            <button class="toggle-btn" id="toggleBtn">Accendi/Spegni</button>
+        </div>
+
+        <div class="color-picker">
+            <label for="colorPicker">Colore:</label>
+            <input type="color" id="colorPicker" value="#ffffff">
+        </div>
+
+        <div class="preset-colors">
+            <div class="preset-color" style="background-color: #ffffff" data-color="#ffffff"></div>
+            <div class="preset-color" style="background-color: #ff0000" data-color="#ff0000"></div>
+            <div class="preset-color" style="background-color: #00ff00" data-color="#00ff00"></div>
+            <div class="preset-color" style="background-color: #0000ff" data-color="#0000ff"></div>
+            <div class="preset-color" style="background-color: #ffff00" data-color="#ffff00"></div>
+            <div class="preset-color" style="background-color: #ff00ff" data-color="#ff00ff"></div>
+            <div class="preset-color" style="background-color: #00ffff" data-color="#00ffff"></div>
+            <div class="preset-color" style="background-color: #ffa500" data-color="#ffa500"></div>
+        </div>
+
+        <div class="brightness-control">
+            <label for="brightnessSlider">Luminosità: <span id="brightnessValue">100</span>%</label><br>
+            <input type="range" id="brightnessSlider" min="0" max="100" value="100">
+        </div>
+
+        <div class="status" id="status">
+            <strong>Stato:</strong> <span id="statusText">Spenta</span><br>
+            <strong>Colore:</strong> <span id="colorText">#ffffff</span><br>
+            <strong>Luminosità:</strong> <span id="luminositaText">100%</span>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
