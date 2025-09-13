@@ -10,7 +10,19 @@
       "Bash(npm install)",
       "Bash(timeout 10 npm start)",
       "Bash(npm install:*)",
-      "Bash(npm run all:*)"
+      "Bash(npm run all:*)",
+      "Bash(claude mcp call:*)",
+      "Bash(claude mcp:*)",
+      "Bash(curl:*)",
+      "Bash(node:*)",
+      "Bash(npm start)",
+      "Bash(taskkill:*)",
+      "Bash(tasklist:*)",
+      "Bash(findstr:*)",
+      "mcp__lampadina__lampadina_stato",
+      "mcp__lampadina__lampadina_toggle",
+      "mcp__lampadina__lampadina_preset",
+      "mcp__lampadina__lampadina_colore"
     ],
     "deny": [],
     "ask": []
