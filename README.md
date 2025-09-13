@@ -2,6 +2,10 @@
 
 Un progetto dimostrativo che implementa una lampadina virtuale controllabile tramite **Model Context Protocol (MCP)** per integrazione con Claude Code.
 
+**🚀 Disponibile in due implementazioni complete:**
+- **Node.js** - Versione originale con Express e Socket.IO
+- **.NET** - Versione moderna con ASP.NET Core e SignalR
+
 ## ✨ Caratteristiche
 
 - 🌐 **Interfaccia Web**: Interfaccia grafica reattiva per controllare la lampadina
@@ -13,6 +17,7 @@ Un progetto dimostrativo che implementa una lampadina virtuale controllabile tra
 
 ## 🚀 Installazione
 
+### Versione Node.js
 ```bash
 # Clona il repository
 git clone <url-repository>
@@ -22,16 +27,34 @@ cd mcp-lampadina
 npm install
 ```
 
+### Versione .NET
+```bash
+# Vai nella cartella .NET
+cd MCP-Lampadina-NET/McpLampada
+
+# Ripristina le dipendenze (automatico)
+dotnet restore
+```
+
 ## 🎮 Utilizzo
 
 ### 1. Avvia il Server Web
+
+#### Node.js
 ```bash
 npm start
 ```
-
 La lampadina sarà disponibile su:
 - **Interfaccia Web**: http://localhost:3000
 - **WebSocket**: ws://localhost:8080
+
+#### .NET
+```bash
+dotnet run
+```
+La lampadina sarà disponibile su:
+- **Interfaccia Web**: http://localhost:5000 (o porta dinamica)
+- **SignalR Hub**: http://localhost:5000/lampada-hub
 
 ### 2. Configurazione MCP per Claude Code
 
@@ -51,12 +74,24 @@ Aggiungi questa configurazione al tuo `claude_desktop_config.json`:
 ```
 
 #### Opzione B: Configurazione HTTP con claude mcp add
+
+**Node.js:**
 ```bash
 # Prima avvia entrambi i server
 npm run all
 
 # Poi usa il comando claude mcp add
 claude mcp add lampadina --transport http http://localhost:3001/mcp
+```
+
+**.NET:**
+```bash
+# Prima avvia il server .NET
+cd MCP-Lampadina-NET/McpLampada
+dotnet run
+
+# Poi usa il comando claude mcp add
+claude mcp add lampadina-net --transport http http://localhost:5000/mcp
 ```
 
 ### 3. Usa Claude Code per Controllare la Lampadina
@@ -139,6 +174,7 @@ npm run all
 
 ## 📁 Struttura Progetto
 
+### Versione Node.js
 ```
 mcp-lampadina/
 ├── server.js              # Server web principale
@@ -152,6 +188,20 @@ mcp-lampadina/
 └── README.md             # Documentazione
 ```
 
+### Versione .NET
+```
+MCP-Lampadina-NET/
+└── McpLampada/
+    ├── Controllers/       # API REST e MCP endpoints
+    ├── Services/          # Business logic e MCP server
+    ├── Models/            # Data models
+    ├── Hubs/              # SignalR hubs
+    ├── Program.cs         # Startup configuration
+    ├── McpLampada.csproj  # Project configuration
+    ├── CLAUDE.md          # Claude Code configuration
+    └── README.md          # Documentation
+```
+
 ## 🤝 Come Funziona MCP
 
 Il **Model Context Protocol** permette a Claude Code di interagire con applicazioni esterne. In questo progetto:
@@ -163,10 +213,32 @@ Il **Model Context Protocol** permette a Claude Code di interagire con applicazi
 
 ## 📝 Note Tecniche
 
+### Node.js
 - **Node.js** con Express per il server web
-- **WebSocket** per comunicazione real-time
+- **Socket.IO** per comunicazione real-time
 - **MCP SDK** per integrazione con Claude Code
 - **Vanilla JavaScript** per il frontend (nessun framework)
+
+### .NET
+- **ASP.NET Core** per server web e API
+- **SignalR** per comunicazione real-time
+- **System.Text.Json** per serializzazione JSON
+- **Minimal APIs** per endpoint leggeri
+
+## 🆚 Confronto Implementazioni
+
+| Caratteristica | Node.js | .NET |
+|---|---|---|
+| **Runtime** | V8 Engine | .NET Runtime |
+| **Linguaggio** | JavaScript | C# |
+| **Server Web** | Express.js | ASP.NET Core |
+| **WebSocket** | Socket.IO | SignalR |
+| **Porta Default** | 3000 | 5000 |
+| **Hot Reload** | nodemon | dotnet watch |
+| **Memoria** | ~50MB | ~25MB |
+| **Avvio** | ~2s | ~1s |
+| **Tipizzazione** | Dinamica | Statica |
+| **Package Manager** | npm | NuGet |
 
 ## 🎯 Scopo del Progetto
 

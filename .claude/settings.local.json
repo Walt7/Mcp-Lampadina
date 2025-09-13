@@ -22,7 +22,11 @@
       "mcp__lampadina__lampadina_stato",
       "mcp__lampadina__lampadina_toggle",
       "mcp__lampadina__lampadina_preset",
-      "mcp__lampadina__lampadina_colore"
+      "mcp__lampadina__lampadina_colore",
+      "Bash(dotnet new:*)",
+      "Bash(dotnet add package:*)",
+      "Bash(dotnet run:*)",
+      "mcp__lampadina__lampadina_luminosita"
     ],
     "deny": [],
     "ask": []

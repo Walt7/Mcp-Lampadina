@@ -1,9 +1,40 @@
+# Node.js
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.DS_Store
+pnpm-debug.log*
+*.log
+
+# Environment variables
 .env
 .env.local
 .env.production
-*.log
+.env.test
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Claude Code settings (keep local only)
+.claude/settings.local.json
+
+# .NET specific files
+MCP-Lampadina-NET/**/bin/
+MCP-Lampadina-NET/**/obj/
+MCP-Lampadina-NET/**/*.user
+MCP-Lampadina-NET/**/*.suo
+MCP-Lampadina-NET/**/*.cache
+MCP-Lampadina-NET/**/Properties/launchSettings.json
