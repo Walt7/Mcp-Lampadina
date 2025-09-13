@@ -1,5 +1,14 @@
 # Configurazione Claude Code per MCP Lampadina
 
+## Configurazione MCP HTTP
+```bash
+# Avvia i server
+npm run all
+
+# Aggiungi il server MCP a Claude Code
+claude mcp add lampadina --transport http http://localhost:3001/mcp
+```
+
 ## Comandi di Test e Build
 - `npm start` - Avvia il server web principale
 - `npm run dev` - Modalità sviluppo con nodemon

@@ -35,6 +35,7 @@ La lampadina sarà disponibile su:
 
 ### 2. Configurazione MCP per Claude Code
 
+#### Opzione A: Configurazione locale (stdio)
 Aggiungi questa configurazione al tuo `claude_desktop_config.json`:
 
 ```json
@@ -47,6 +48,15 @@ Aggiungi questa configurazione al tuo `claude_desktop_config.json`:
     }
   }
 }
+```
+
+#### Opzione B: Configurazione HTTP con claude mcp add
+```bash
+# Prima avvia entrambi i server
+npm run all
+
+# Poi usa il comando claude mcp add
+claude mcp add lampadina --transport http http://localhost:3001/mcp
 ```
 
 ### 3. Usa Claude Code per Controllare la Lampadina
@@ -117,21 +127,29 @@ Accende o spegne la lampadina.
 # Modalità sviluppo con hot reload
 npm run dev
 
-# Avvia solo il server MCP
+# Avvia solo il server MCP (stdio)
 npm run mcp
+
+# Avvia solo il server MCP HTTP
+npm run mcp-http
+
+# Avvia entrambi i server (web + MCP HTTP)
+npm run all
 ```
 
 ## 📁 Struttura Progetto
 
 ```
 mcp-lampadina/
-├── server.js          # Server web principale
-├── mcp-server.js      # Server MCP
-├── package.json       # Configurazione Node.js
-├── public/            # File statici web
-│   ├── index.html     # Interfaccia utente
-│   └── script.js      # Logica frontend
-└── README.md         # Documentazione
+├── server.js              # Server web principale
+├── mcp-server.js          # Server MCP (stdio)
+├── mcp-http-server.js     # Server MCP HTTP
+├── package.json           # Configurazione Node.js
+├── public/                # File statici web
+│   ├── index.html         # Interfaccia utente
+│   └── script.js          # Logica frontend
+├── CLAUDE.md             # Configurazione Claude Code
+└── README.md             # Documentazione
 ```
 
 ## 🤝 Come Funziona MCP

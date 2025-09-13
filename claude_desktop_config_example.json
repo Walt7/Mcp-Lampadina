@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "lampadina": {
+      "command": "node",
+      "args": ["C:\\Progetti\\Personali\\Mcp-Lampadina\\mcp-server.js"],
+      "cwd": "C:\\Progetti\\Personali\\Mcp-Lampadina"
+    }
+  }
+}
