@@ -33,6 +33,7 @@ namespace McpLampadinaWinForms
             this.lblServerStatus = new System.Windows.Forms.Label();
             this.lblTitolo = new System.Windows.Forms.Label();
             this.txtDebug = new System.Windows.Forms.TextBox();
+            this.btnPulisciLog = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarLuminosita)).BeginInit();
             this.groupBoxPreset.SuspendLayout();
             this.SuspendLayout();
@@ -198,15 +199,27 @@ namespace McpLampadinaWinForms
             this.txtDebug.Name = "txtDebug";
             this.txtDebug.ReadOnly = true;
             this.txtDebug.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtDebug.Size = new System.Drawing.Size(560, 120);
+            this.txtDebug.Size = new System.Drawing.Size(460, 120);
             this.txtDebug.TabIndex = 9;
             this.txtDebug.Text = "[Debug MCP]\r\n";
+
+            // btnPulisciLog
+            this.btnPulisciLog.BackColor = System.Drawing.Color.FromArgb(255, 200, 100);
+            this.btnPulisciLog.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
+            this.btnPulisciLog.Location = new System.Drawing.Point(490, 430);
+            this.btnPulisciLog.Name = "btnPulisciLog";
+            this.btnPulisciLog.Size = new System.Drawing.Size(90, 30);
+            this.btnPulisciLog.TabIndex = 10;
+            this.btnPulisciLog.Text = "Pulisci Log";
+            this.btnPulisciLog.UseVisualStyleBackColor = false;
+            this.btnPulisciLog.Click += new System.EventHandler(this.btnPulisciLog_Click);
 
             // LampadinaForm
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(240, 240, 240);
             this.ClientSize = new System.Drawing.Size(600, 580);
+            this.Controls.Add(this.btnPulisciLog);
             this.Controls.Add(this.txtDebug);
             this.Controls.Add(this.lblTitolo);
             this.Controls.Add(this.lblServerStatus);
@@ -248,5 +261,6 @@ namespace McpLampadinaWinForms
         private System.Windows.Forms.Label lblServerStatus;
         private System.Windows.Forms.Label lblTitolo;
         private System.Windows.Forms.TextBox txtDebug;
+        private System.Windows.Forms.Button btnPulisciLog;
     }
 }

@@ -1,8 +1,9 @@
 # Configurazione Claude Code per MCP Lampadina
 
-🚀 **Disponibile in due implementazioni:**
+🚀 **Disponibile in tre implementazioni:**
 - **Node.js** - Versione originale con Express e Socket.IO
 - **.NET** - Versione moderna con ASP.NET Core e SignalR
+- **WinForms** - Versione desktop con interfaccia Windows Forms (.NET 4.7)
 
 ## Configurazione MCP HTTP
 
@@ -25,6 +26,17 @@ dotnet run
 claude mcp add lampadina-net --transport http http://localhost:5000/mcp
 ```
 
+### WinForms (Versione Desktop)
+```bash
+# Compila e avvia l'applicazione WinForms
+cd MCP-Lampadina-WinForms
+# Apri McpLampadinaWinForms.sln in Visual Studio oppure
+# Avvia direttamente il file .exe dalla cartella bin/Debug
+
+# Aggiungi il server MCP WinForms a Claude Code
+claude mcp add lampadina-winforms --transport http http://localhost:5001/mcp
+```
+
 ## Comandi di Test e Build
 
 ### Node.js
@@ -36,6 +48,12 @@ claude mcp add lampadina-net --transport http http://localhost:5000/mcp
 - `dotnet run` - Avvia il server
 - `dotnet watch run` - Modalità sviluppo con hot reload
 - `dotnet build` - Compila il progetto
+
+### WinForms
+- Avvia l'applicazione tramite Visual Studio o file .exe
+- Il server MCP si avvia automaticamente sulla porta 5001
+- Interfaccia grafica desktop per controllo diretto della lampadina
+- Include log di debug integrato per monitorare le richieste MCP
 
 ## Struttura del Progetto
 
@@ -52,13 +70,20 @@ claude mcp add lampadina-net --transport http http://localhost:5000/mcp
 - `Hubs/` - SignalR Hub per real-time
 - `Program.cs` - Configurazione startup
 
-## Stato della Lampadina (Entrambe le Versioni)
+### WinForms
+- `LampadinaForm.cs` - Form principale con UI e controlli
+- `LampadinaForm.Designer.cs` - Definizione interfaccia grafica
+- `McpServer.cs` - Server MCP HTTP integrato
+- `Program.cs` - Entry point dell'applicazione
+- Include pulsante "Pulisci Log" per gestione del debug
+
+## Stato della Lampadina (Tutte le Versioni)
 La lampadina ha tre proprietà principali:
 - `accesa` (boolean) - Se la lampadina è accesa o spenta
 - `colore` (string) - Colore in formato esadecimale (es: #ff0000)
 - `luminosita` (number) - Luminosità da 0 a 100
 
-## Server MCP Configurato (Identici per Entrambe le Versioni)
+## Server MCP Configurato (Identici per Tutte le Versioni)
 Il server MCP espone questi strumenti:
 - `lampadina_stato` - Ottiene stato attuale
 - `lampadina_toggle` - Accende/spegne
@@ -80,16 +105,25 @@ Il server MCP espone questi strumenti:
 - Gli aggiornamenti sono sincronizzati in tempo reale via SignalR
 - I preset colori sono identici alla versione Node.js
 
+### WinForms
+- L'applicazione desktop deve essere avviata per utilizzare gli strumenti MCP
+- Interfaccia grafica nativa Windows con controlli diretti per lampadina
+- Server MCP integrato in esecuzione su porta 5001
+- Log di debug in tempo reale per monitorare le richieste MCP
+- I preset colori sono identici alle altre versioni
+
 ## Differenze Principali
 
-| Caratteristica | Node.js | .NET |
-|---|---|---|
-| **Porta Web** | 3000 | 5000 |
-| **Porta MCP** | 3001 | 5000 |
-| **WebSocket** | Socket.IO | SignalR |
-| **Avvio** | `npm start` | `dotnet run` |
-| **Hot Reload** | `npm run dev` | `dotnet watch run` |
-| **Config MCP** | `lampadina` | `lampadina-net` |
+| Caratteristica | Node.js | .NET | WinForms |
+|---|---|---|---|
+| **Tipo Interface** | Web Browser | Web Browser | Desktop Nativo |
+| **Porta Web** | 3000 | 5000 | N/A |
+| **Porta MCP** | 3001 | 5000 | 5001 |
+| **Real-time** | Socket.IO | SignalR | Form Events |
+| **Avvio** | `npm start` | `dotnet run` | Visual Studio/.exe |
+| **Hot Reload** | `npm run dev` | `dotnet watch run` | N/A |
+| **Config MCP** | `lampadina` | `lampadina-net` | `lampadina-winforms` |
+| **Debug Log** | Console | Console | UI Integrato |
 
 ## Testing MCP
 
@@ -106,7 +140,15 @@ Per testare l'integrazione MCP:
 3. Usa gli stessi comandi conversazionali della versione Node.js
 4. Verifica i cambiamenti nell'interfaccia web su porta 5000
 
-### Esempi di Utilizzo MCP (Identici per Entrambe le Versioni)
+### WinForms (Versione Desktop)
+Per testare l'integrazione MCP:
+1. Avvia l'applicazione: Apri in Visual Studio o esegui il file .exe
+2. Configura MCP: `claude mcp add lampadina-winforms --transport http http://localhost:5001/mcp`
+3. Usa gli stessi comandi conversazionali delle altre versioni
+4. Verifica i cambiamenti direttamente nell'interfaccia desktop
+5. Monitora le richieste MCP nel log di debug integrato
+
+### Esempi di Utilizzo MCP (Identici per Tutte le Versioni)
 
 #### Controllo dello Stato
 ```javascript
@@ -178,11 +220,18 @@ Puoi anche usare comandi in linguaggio naturale:
 3. **Interfaccia web**: Apri http://localhost:5000 per vedere i cambiamenti in tempo reale
 4. **SignalR**: I cambiamenti via MCP si riflettono immediatamente nell'interfaccia web
 
+#### WinForms
+1. **Applicazione attiva**: Verifica che l'app WinForms sia in esecuzione e mostri "MCP Server attivo su porta 5001"
+2. **MCP funzionante**: Usa gli strumenti con server `lampadina-winforms`
+3. **Interfaccia desktop**: I cambiamenti sono visibili immediatamente nel form
+4. **Debug integrato**: Monitora le richieste MCP nel log di debug in tempo reale
+
 ### Quale Versione Scegliere?
 
-| Scegli Node.js se: | Scegli .NET se: |
-|---|---|
-| Hai già familiarità con JavaScript | Preferisci la tipizzazione statica |
-| Vuoi prototipare rapidamente | Vuoi performance migliori |
-| Lavori in ambiente JavaScript | Lavori in ambiente Microsoft |
-| Preferisci meno struttura | Vuoi più struttura e sicurezza |
+| Scegli Node.js se: | Scegli .NET se: | Scegli WinForms se: |
+|---|---|---|
+| Hai familiarità con JavaScript | Preferisci tipizzazione statica | Vuoi un'applicazione desktop |
+| Vuoi prototipare rapidamente | Vuoi performance migliori | Lavori principalmente su Windows |
+| Lavori in ambiente JavaScript | Lavori in ambiente Microsoft | Preferisci interfacce native |
+| Preferisci meno struttura | Vuoi più struttura e sicurezza | Vuoi debug integrato visuale |
+| Sviluppo web-first | Architettura moderna | Controllo diretto dell'UI |

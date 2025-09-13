@@ -158,5 +158,12 @@ namespace McpLampadinaWinForms
         {
             CambiaColore("#ff6600");
         }
+
+        private void btnPulisciLog_Click(object sender, EventArgs e)
+        {
+            txtDebug.Clear();
+            txtDebug.Text = "[Debug MCP]\r\n";
+            LogDebug("📝 Log pulito dall'utente");
+        }
     }
 }
