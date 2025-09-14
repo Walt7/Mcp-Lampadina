@@ -38,3 +38,4 @@ MCP-Lampadina-NET/**/*.user
 MCP-Lampadina-NET/**/*.suo
 MCP-Lampadina-NET/**/*.cache
 MCP-Lampadina-NET/**/Properties/launchSettings.json
+.claude
