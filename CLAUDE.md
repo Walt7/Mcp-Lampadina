@@ -148,6 +148,12 @@ Per testare l'integrazione MCP:
 4. Verifica i cambiamenti direttamente nell'interfaccia desktop
 5. Monitora le richieste MCP nel log di debug integrato
 
+**Nota**: La versione WinForms include correzioni specifiche per la stabilità del client Claude Code:
+- Parsing JSON robusto per oggetti annidati (es. `"arguments":{"preset":"blu"}`)
+- Gestione corretta delle connessioni HTTP Keep-Alive
+- Debug logging completo per troubleshooting
+- Thread safety per aggiornamenti UI cross-thread
+
 ### Esempi di Utilizzo MCP (Identici per Tutte le Versioni)
 
 #### Controllo dello Stato

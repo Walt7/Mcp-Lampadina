@@ -62,15 +62,29 @@ namespace McpLampadinaWinForms
 
             try
             {
+                // Chiudi listener per prima cosa
                 _listener?.Stop();
+
+                // Chiudi e libera HttpListener
                 _listener?.Close();
-                _listenerThread?.Join(THREAD_JOIN_TIMEOUT);
+
+                // Aspetta che il thread finisca del tutto prima di andare avanti
+                if (_listenerThread != null && _listenerThread.IsAlive)
+                {
+                    if (!_listenerThread.Join(THREAD_JOIN_TIMEOUT))
+                    {
+                        try { _listenerThread.Interrupt(); } catch { }
+                    }
+                }
+
+                _form.LogDebug("🛑 MCP Server fermato correttamente");
             }
             catch (Exception ex)
             {
                 _form.LogDebug($"⚠️ Errore durante stop server: {ex.Message}");
             }
         }
+
 
         // Modello Sincrono: più stabile, elimina race condition
         private void ListenForRequests()
@@ -94,6 +108,7 @@ namespace McpLampadinaWinForms
             }
         }
 
+        // SOSTITUISCI SOLO QUESTO METODO
         private void ProcessRequest(HttpListenerContext context)
         {
             var request = context.Request;
@@ -101,14 +116,11 @@ namespace McpLampadinaWinForms
             string responseText = null;
             int statusCode = 200;
             string requestId = "null";
+            bool isNotificationResponse = false; // Flag per identificare la risposta a una notifica
 
             try
             {
-                // ========== MODIFICA CHIAVE ==========
-                // Forza la connessione a rimanere aperta per la richiesta successiva.
-                // Questo è il punto cruciale che risolve il crash del client.
-                response.KeepAlive = true;
-                // =====================================
+                response.KeepAlive = false; // Visto che il client non la usa, siamo espliciti.
 
                 response.Headers.Add("Access-Control-Allow-Origin", "*");
                 response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
@@ -141,16 +153,17 @@ namespace McpLampadinaWinForms
                         }
                         else
                         {
-                            //_form.LogDebug($"📨 Body ricevuto: {requestBody}");
+                            _form.LogDebug($"📨 Body ricevuto: {requestBody}");
                             responseText = ProcessMcpRequest(requestBody);
 
                             if (responseText == null)
                             {
                                 statusCode = 204; // Notifica ricevuta
+                                isNotificationResponse = true; // Imposta il flag
                             }
                             else
                             {
-                                //_form.LogDebug($"📤 Risposta inviata: {responseText}");
+                                _form.LogDebug($"📤 Risposta inviata: {responseText}");
                                 response.ContentType = "application/json";
                             }
                         }
@@ -174,6 +187,16 @@ namespace McpLampadinaWinForms
             {
                 try
                 {
+                    // ========== LA MODIFICA DECISIVA ==========
+                    // Se stiamo per chiudere la connessione per una notifica,
+                    // attendiamo un istante. Questo risolve la race condition
+                    // con il client che apre la connessione successiva.
+                    if (isNotificationResponse)
+                    {
+                        Thread.Sleep(50); // 50 millisecondi sono più che sufficienti
+                    }
+                    // ==========================================
+
                     response.StatusCode = statusCode;
 
                     if (statusCode != 204)
@@ -194,7 +217,6 @@ namespace McpLampadinaWinForms
                 }
             }
         }
-
         private string ProcessMcpRequest(string requestBody)
         {
             bool isNotification = !Regex.IsMatch(requestBody, @"""id""\s*:");
@@ -224,9 +246,6 @@ namespace McpLampadinaWinForms
             }
         }
 
-        // ... TUTTI GLI ALTRI METODI (GetToolsList, ProcessToolCall, helpers, etc.) RIMANGONO INVARIATI ...
-        // Li includo qui sotto per completezza, non contengono modifiche.
-
         private string GetInitializeResponse(string id)
         {
             return $@"{{""jsonrpc"":""2.0"",""id"":{FormatJsonId(id)},""result"":{{""protocolVersion"":""{PROTOCOL_VERSION}"",""capabilities"":{{""tools"":{{}}}},""serverInfo"":{{""name"":""{SERVER_NAME}"",""version"":""{SERVER_VERSION}""}}}}}}";
@@ -244,15 +263,36 @@ namespace McpLampadinaWinForms
                 string toolName = ExtractNestedJsonValue(requestBody, "params", "name");
                 string argumentsJson = ExtractNestedJsonValue(requestBody, "params", "arguments");
 
+                _form.LogDebug($"🔧 Tool: '{toolName}', Arguments: '{argumentsJson}'");
+
                 string result;
                 switch (toolName)
                 {
-                    case "lampadina_stato": result = GetLampadinaStato(); break;
-                    case "lampadina_toggle": result = ToggleLampadina(); break;
-                    case "lampadina_colore": result = CambiaColore(ExtractJsonValue(argumentsJson, "colore")); break;
-                    case "lampadina_luminosita": result = CambiaLuminosita(ParseIntSafe(ExtractJsonValue(argumentsJson, "luminosita"))); break;
-                    case "lampadina_preset": result = ApplicaPreset(ExtractJsonValue(argumentsJson, "preset")); break;
-                    default: result = $"❌ Errore: strumento '{toolName}' non riconosciuto"; break;
+                    case "lampadina_stato":
+                        result = GetLampadinaStato();
+                        break;
+                    case "lampadina_toggle":
+                        result = ToggleLampadina();
+                        break;
+                    case "lampadina_colore":
+                        string colore = ExtractJsonValue(argumentsJson, "colore");
+                        _form.LogDebug($"🎨 Colore estratto: '{colore}'");
+                        result = CambiaColore(colore);
+                        break;
+                    case "lampadina_luminosita":
+                        string lumStr = ExtractJsonValue(argumentsJson, "luminosita");
+                        int luminosita = ParseIntSafe(lumStr);
+                        _form.LogDebug($"💡 Luminosità estratta: '{lumStr}' -> {luminosita}");
+                        result = CambiaLuminosita(luminosita);
+                        break;
+                    case "lampadina_preset":
+                        string preset = ExtractJsonValue(argumentsJson, "preset");
+                        _form.LogDebug($"🎯 Preset estratto: '{preset}'");
+                        result = ApplicaPreset(preset);
+                        break;
+                    default:
+                        result = $"❌ Errore: strumento '{toolName}' non riconosciuto";
+                        break;
                 }
 
                 return $@"{{""jsonrpc"":""2.0"",""id"":{FormatJsonId(id)},""result"":{{""content"":[{{""type"":""text"",""text"":""{EscapeJsonString(result)}""}}]}}}}";
@@ -318,15 +358,106 @@ namespace McpLampadinaWinForms
         private string ExtractJsonValue(string json, string key)
         {
             if (string.IsNullOrEmpty(json) || string.IsNullOrEmpty(key)) return "";
-            string pattern = $@"""{key}""\s*:\s*""([^""]*)"""; var match = Regex.Match(json, pattern); if (match.Success) return match.Groups[1].Value;
-            pattern = $@"""{key}""\s*:\s*(-?\d+(\.\d+)?|true|false|null)"; match = Regex.Match(json, pattern); if (match.Success) return match.Groups[1].Value;
+
+            // Cerca stringhe tra virgolette: "key":"value"
+            string pattern = $@"""{key}""\s*:\s*""([^""]*)""";
+            var match = Regex.Match(json, pattern);
+            if (match.Success) return match.Groups[1].Value;
+
+            // Cerca numeri/booleani/null: "key":value
+            pattern = $@"""{key}""\s*:\s*(-?\d+(\.\d+)?|true|false|null)";
+            match = Regex.Match(json, pattern);
+            if (match.Success) return match.Groups[1].Value;
+
+            // Cerca oggetti JSON: "key":{...}
+            int keyIndex = json.IndexOf($"\"{key}\":");
+            if (keyIndex != -1)
+            {
+                int colonIndex = json.IndexOf(':', keyIndex);
+                if (colonIndex != -1)
+                {
+                    // Salta spazi dopo i due punti
+                    int startIndex = colonIndex + 1;
+                    while (startIndex < json.Length && char.IsWhiteSpace(json[startIndex]))
+                        startIndex++;
+
+                    if (startIndex < json.Length && json[startIndex] == '{')
+                    {
+                        // Conta parentesi graffe per estrarre l'oggetto completo
+                        int braceCount = 1;
+                        int currentPos = startIndex + 1;
+
+                        while (currentPos < json.Length && braceCount > 0)
+                        {
+                            if (json[currentPos] == '{') braceCount++;
+                            else if (json[currentPos] == '}') braceCount--;
+                            currentPos++;
+                        }
+
+                        if (braceCount == 0)
+                        {
+                            // Estrae solo il contenuto interno dell'oggetto (senza le parentesi graffe esterne)
+                            return json.Substring(startIndex + 1, currentPos - startIndex - 2);
+                        }
+                    }
+                }
+            }
+
             return "";
         }
         private string ExtractNestedJsonValue(string json, string parentKey, string childKey)
         {
-            if (string.IsNullOrEmpty(json)) return "";
-            string parentPattern = $@"""{parentKey}""\s*:\s*({{((?>[^{{}}]+|{{(?<c>)|}}(?<-c>))*(?(c)(?!)))}})"; var parentMatch = Regex.Match(json, parentPattern, RegexOptions.Singleline); if (!parentMatch.Success) return "";
-            string parentValue = parentMatch.Groups[1].Value; return ExtractJsonValue(parentValue, childKey);
+            if (string.IsNullOrEmpty(json))
+            {
+                _form.LogDebug($"🔍 ExtractNestedJsonValue: JSON vuoto");
+                return "";
+            }
+
+            _form.LogDebug($"🔍 Cercando '{parentKey}' -> '{childKey}' in: {json.Substring(0, Math.Min(json.Length, 200))}...");
+
+            // Cerca il pattern "parentKey": { ... }
+            int start = json.IndexOf($"\"{parentKey}\":");
+            if (start == -1)
+            {
+                _form.LogDebug($"🔍 Chiave '{parentKey}' non trovata");
+                return "";
+            }
+
+            _form.LogDebug($"🔍 Trovata chiave '{parentKey}' alla posizione {start}");
+
+            // Trova l'inizio dell'oggetto JSON
+            int braceStart = json.IndexOf('{', start);
+            if (braceStart == -1)
+            {
+                _form.LogDebug($"🔍 Parentesi graffa di apertura non trovata dopo '{parentKey}'");
+                return "";
+            }
+
+            // Conta le parentesi graffe per trovare la fine dell'oggetto
+            int braceCount = 1;
+            int currentPos = braceStart + 1;
+
+            while (currentPos < json.Length && braceCount > 0)
+            {
+                if (json[currentPos] == '{') braceCount++;
+                else if (json[currentPos] == '}') braceCount--;
+                currentPos++;
+            }
+
+            if (braceCount != 0)
+            {
+                _form.LogDebug($"🔍 JSON malformato, parentesi non bilanciate");
+                return ""; // JSON malformato
+            }
+
+            // Estrae il contenuto dell'oggetto
+            string parentValue = json.Substring(braceStart + 1, currentPos - braceStart - 2);
+            _form.LogDebug($"🔍 Estratto oggetto '{parentKey}': {parentValue}");
+
+            string result = ExtractJsonValue(parentValue, childKey);
+            _form.LogDebug($"🔍 Risultato finale per '{childKey}': '{result}'");
+
+            return result;
         }
         private string EscapeJsonString(string str)
         {
